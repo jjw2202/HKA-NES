@@ -5,12 +5,13 @@ use IEEE.STD_LOGIC_1164.ALL;
 use ieee.numeric_std_unsigned.all;
 use ieee.math_real.all;
 
-
+--timing: load enable must be 1 at a rising edge of clock, load enable has to be 0 before the first load
 
 entity pixel_data_sort is
     port (
         i_clk : in STD_LOGIC;
-        i_load_enable : in STD_LOGIC;
+        i_back_load_enable : in STD_LOGIC;
+        i_sprite_load_enable : in STD_LOGIC;
 
         i_back_pattern_low : in STD_LOGIC_VECTOR (7 downto 0);
         i_back_pattern_high : in STD_LOGIC_VECTOR (7 downto 0);
@@ -57,7 +58,7 @@ begin
     background: entity work.pixel_data_sort_background
     port map (
         i_clk => i_clk,
-        i_load_enbl => i_load_enable,
+        i_load_enbl => i_back_load_enable,
 
         i_back_pattern_low => i_back_pattern_low,
         i_back_pattern_high => i_back_pattern_high,
@@ -70,7 +71,7 @@ begin
     port map (
 
         i_clk                  => i_clk,
-        i_load_enable          => i_load_enable,
+        i_load_enable          => i_sprite_load_enable,
         i_sprite_pattern_low_0 => i_sprite_pattern_low_0,
         i_sprite_pattern_low_1 => i_sprite_pattern_low_1,
         i_sprite_pattern_low_2 => i_sprite_pattern_low_2,
