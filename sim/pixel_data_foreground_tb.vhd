@@ -89,6 +89,8 @@ begin
     process is
     begin
         --test with just one active shift register
+        s_load_enable <= '0';
+        wait for 1 ns;
         s_load_enable <= '1';
         s_pattern_low_0 <= "11111111";
         s_pattern_high_0 <= "11111111";
@@ -96,9 +98,9 @@ begin
         s_attribute_high (0) <= '1';
         s_priority (0) <= '1';
         s_x_0 <= "00000011";
-        wait for 6 ns;
+        wait for 5 ns;
         s_load_enable <= '0';
-        wait for 130 ns;
+        wait for 135 ns;
         --test if it shows the right shift register
         s_load_enable <= '1';
         s_pattern_low_0 <= "01010101";
@@ -113,7 +115,7 @@ begin
         s_attribute_low (5) <= '1';
         s_attribute_high (5) <= '1';
         s_priority (5) <= '1';
-        s_x_0 <= "00000000";
+        s_x_5 <= "00000000";
         wait for 6 ns;
         s_load_enable <= '0';
         wait for 200 ns;

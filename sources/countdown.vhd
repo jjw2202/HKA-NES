@@ -18,7 +18,7 @@ end entity;
 architecture Behavioral of countdown is
     signal s_count : STD_LOGIC_VECTOR (7 downto 0) := (others => '0');
     signal s_next_count : std_logic_vector (7 downto 0);
-    signal s_next_zero : STD_LOGIC;
+
 begin
 
     --count down if not zero, else reset counter and set zeroflag
