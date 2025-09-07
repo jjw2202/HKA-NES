@@ -1,4 +1,5 @@
 --background part of pixel_data_sort
+--8 bit data is loaded into 16 bit shift registers
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
