@@ -104,14 +104,14 @@ begin
         --test if it shows the right shift register
         s_load_enable <= '1';
         s_pattern_low_0 <= "01010101";
-        s_pattern_high_0 <= "01010101";
+        s_pattern_high_0 <= "01010100";
         s_attribute_low (0) <= '1';
         s_attribute_high (0) <= '1';
         s_priority (0) <= '1';
         s_x_0 <= "00000011";
 
         s_pattern_low_5 <= "01010101";
-        s_pattern_high_5 <= "01010101";
+        s_pattern_high_5 <= "01011101";
         s_attribute_low (5) <= '1';
         s_attribute_high (5) <= '1';
         s_priority (5) <= '1';

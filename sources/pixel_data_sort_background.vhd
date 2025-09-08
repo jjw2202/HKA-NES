@@ -35,6 +35,7 @@ begin
         i_shift => '0',
         o_shift => o_one_pixel(0),
         i_clk => i_clk,
+        i_flip => '0',
         i_load_enbl => i_load_enbl,
         i_parallel_load => i_back_pattern_low,
         i_shift_enbl => '1'
@@ -49,6 +50,7 @@ begin
         i_shift => '0',
         o_shift => o_one_pixel(1),
         i_clk => i_clk,
+        i_flip => '0',
         i_load_enbl => i_load_enbl,
         i_parallel_load => i_back_pattern_high,
         i_shift_enbl => '1'
@@ -63,6 +65,7 @@ begin
         i_shift => '0',
         o_shift => o_one_pixel(2),
         i_clk => i_clk,
+        i_flip => '0',
         i_load_enbl => i_load_enbl,
         i_parallel_load => s_attribute_low_wide,
         i_shift_enbl => '1'
@@ -77,6 +80,7 @@ begin
         i_shift => '0',
         o_shift => o_one_pixel(3),
         i_clk => i_clk,
+        i_flip => '0',
         i_load_enbl => i_load_enbl,
         i_parallel_load => s_attribute_high_wide,
         i_shift_enbl => '1'
