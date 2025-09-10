@@ -40,6 +40,9 @@ architecture rtl of tb_testbild_pipeline is
   signal s_gen      : std_logic := '0';
   signal s_addr_mux : std_logic_vector(13 downto 0);
 
+  constant CLK_PERIOD : time    := 5 ns;
+  signal clk_count    : integer := 0;
+
 begin
 
   pram : entity work.ram
@@ -74,6 +77,9 @@ begin
   clk_gen : process (all) is
   begin
     s_clk <= not s_clk after 5 ns;
+    if rising_edge(s_clk) then
+      clk_count <= clk_count + 1;
+    end if;
   end process;
 
   pram_addr_mux : process (all) is
@@ -112,16 +118,18 @@ begin
     s_enb <= '1';
     s_gen <= '1';
 
+    wait until falling_edge(s_clk);
+
     -- Generate test picture
     s_load          <= '1';
-    s_pattern_low   <= "11000110";
+    s_pattern_low   <= "01100011";
     s_attribute_low <= '1';
     wait for 6 ns;
     s_load <= '0';
     wait for 74 ns;
 
     s_load           <= '1';
-    s_pattern_low    <= "11111110";
+    s_pattern_low    <= "01111111";
     s_attribute_low  <= '0';
     s_attribute_high <= '1';
     wait for 6 ns;
@@ -129,21 +137,21 @@ begin
     wait for 74 ns;
 
     s_load          <= '1';
-    s_pattern_low   <= "01111000";
+    s_pattern_low   <= "00011110";
     s_attribute_low <= '1';
     wait for 6 ns;
     s_load <= '0';
     wait for 74 ns;
 
     s_load           <= '1';
-    s_pattern_low    <= "11100110";
+    s_pattern_low    <= "01100111";
     s_attribute_high <= '0';
     wait for 6 ns;
     s_load <= '0';
     wait for 74 ns;
 
     s_load           <= '1';
-    s_pattern_low    <= "11000000";
+    s_pattern_low    <= "00000011";
     s_attribute_low  <= '0';
     s_attribute_high <= '1';
     wait for 6 ns;
@@ -151,21 +159,21 @@ begin
     wait for 74 ns;
 
     s_load          <= '1';
-    s_pattern_low   <= "11001100";
+    s_pattern_low   <= "00110011";
     s_attribute_low <= '1';
     wait for 6 ns;
     s_load <= '0';
     wait for 74 ns;
 
     s_load           <= '1';
-    s_pattern_low    <= "11110110";
+    s_pattern_low    <= "01101111";
     s_attribute_high <= '0';
     wait for 6 ns;
     s_load <= '0';
     wait for 74 ns;
 
     s_load           <= '1';
-    s_pattern_low    <= "11000000";
+    s_pattern_low    <= "00000011";
     s_attribute_low  <= '0';
     s_attribute_high <= '1';
     wait for 6 ns;
@@ -173,21 +181,21 @@ begin
     wait for 74 ns;
 
     s_load          <= '1';
-    s_pattern_low   <= "11000000";
+    s_pattern_low   <= "00000011";
     s_attribute_low <= '1';
     wait for 6 ns;
     s_load <= '0';
     wait for 74 ns;
 
     s_load           <= '1';
-    s_pattern_low    <= "11111110";
+    s_pattern_low    <= "01111111";
     s_attribute_high <= '0';
     wait for 6 ns;
     s_load <= '0';
     wait for 74 ns;
 
     s_load           <= '1';
-    s_pattern_low    <= "11111100";
+    s_pattern_low    <= "00111111";
     s_attribute_low  <= '0';
     s_attribute_high <= '1';
     wait for 6 ns;
@@ -195,21 +203,21 @@ begin
     wait for 74 ns;
 
     s_load          <= '1';
-    s_pattern_low   <= "01111100";
+    s_pattern_low   <= "00111110";
     s_attribute_low <= '1';
     wait for 6 ns;
     s_load <= '0';
     wait for 74 ns;
 
     s_load           <= '1';
-    s_pattern_low    <= "11011110";
+    s_pattern_low    <= "01111011";
     s_attribute_high <= '0';
     wait for 6 ns;
     s_load <= '0';
     wait for 74 ns;
 
     s_load           <= '1';
-    s_pattern_low    <= "11000000";
+    s_pattern_low    <= "00000011";
     s_attribute_low  <= '0';
     s_attribute_high <= '1';
     wait for 6 ns;
@@ -217,21 +225,21 @@ begin
     wait for 74 ns;
 
     s_load          <= '1';
-    s_pattern_low   <= "00000110";
+    s_pattern_low   <= "01100000";
     s_attribute_low <= '1';
     wait for 6 ns;
     s_load <= '0';
     wait for 74 ns;
 
     s_load           <= '1';
-    s_pattern_low    <= "11001110";
+    s_pattern_low    <= "01110011";
     s_attribute_high <= '0';
     wait for 6 ns;
     s_load <= '0';
     wait for 74 ns;
 
     s_load           <= '1';
-    s_pattern_low    <= "11000000";
+    s_pattern_low    <= "00000011";
     s_attribute_low  <= '0';
     s_attribute_high <= '1';
     wait for 6 ns;
@@ -239,21 +247,21 @@ begin
     wait for 74 ns;
 
     s_load          <= '1';
-    s_pattern_low   <= "11000110";
+    s_pattern_low   <= "01100011";
     s_attribute_low <= '1';
     wait for 6 ns;
     s_load <= '0';
     wait for 74 ns;
 
     s_load           <= '1';
-    s_pattern_low    <= "11000110";
+    s_pattern_low    <= "01100011";
     s_attribute_high <= '0';
     wait for 6 ns;
     s_load <= '0';
     wait for 74 ns;
 
     s_load           <= '1';
-    s_pattern_low    <= "11111110";
+    s_pattern_low    <= "01111111";
     s_attribute_low  <= '0';
     s_attribute_high <= '1';
     wait for 6 ns;
@@ -261,7 +269,7 @@ begin
     wait for 74 ns;
 
     s_load          <= '1';
-    s_pattern_low   <= "01111100";
+    s_pattern_low   <= "00111110";
     s_attribute_low <= '1';
     wait for 6 ns;
     s_load <= '0';
@@ -289,18 +297,21 @@ begin
     s_load <= '0';
     wait for 74 ns;
 
-    wait until rising_edge(s_clk);
-    wait until rising_edge(s_clk);
-    finish;
+    wait;
   end process;
 
   write_output : process (s_clk) is
     variable v_line : line;
     variable v_int  : integer;
   begin
-    if s_gen then
-      write(v_line, to_hstring(s_color_pixel));
-      writeline(output, v_line);
+    if rising_edge(s_clk) then
+      if clk_count > 44 then
+        write(v_line, to_hstring(s_color_pixel));
+        writeline(output, v_line);
+      end if;
+      if clk_count = 236 then
+        finish;
+      end if;
     end if;
   end process;
 
