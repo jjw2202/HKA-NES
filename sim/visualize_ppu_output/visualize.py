@@ -28,7 +28,7 @@ def load_colors_from_file(filename):
     return colors
 
 
-def create_color_image(colors, width=23, height=23):
+def create_color_image(colors, width=24, height=8):
     """Creates an image from a list of RGB colors."""
     picture = Image.new("RGB", (width, height))
     pixel = picture.load()
