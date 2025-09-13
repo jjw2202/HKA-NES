@@ -26,7 +26,7 @@ architecture rtl of tb_color_pixel_gen is
   signal s_i_we         : std_logic;
   signal s_i_addr       : std_logic_vector(C_ADDR_WIDTH - 1 downto 0);
   signal s_i_data       : std_logic_vector(C_DATA_WIDTH - 1 downto 0);
-  signal s_o_data       : std_logic_vector(C_DATA_WIDTH - 1 downto 0);
+  signal s_data         : std_logic_vector(C_DATA_WIDTH - 1 downto 0);
 
   -- Color Pixel Generator parameters
   signal s_i_enb              : std_logic;
@@ -34,9 +34,10 @@ architecture rtl of tb_color_pixel_gen is
   signal s_i_background       : std_logic_vector(3 downto 0);
   signal s_i_ppuctrl_bit6     : std_logic;
   signal s_io_ext             : std_logic_vector(3 downto 0);
-  signal s_i_palette_ram_data : std_logic_vector(23 downto 0);
   signal s_o_palette_ram_addr : std_logic_vector(13 downto 0);
   signal s_o_color_pixel      : std_logic_vector(23 downto 0);
+
+  signal s_addr_init : std_logic_vector(C_ADDR_WIDTH - 1 downto 0);
 
   -- Clock management
   constant CLK_PERIOD : time    := 10 ns;
@@ -55,7 +56,7 @@ begin
       i_write_enb => s_i_we,
       i_addr      => s_i_addr,
       i_data      => s_i_data,
-      o_data      => s_o_data
+      o_data      => s_data
     );
 
   dut : entity work.color_pixel_gen
@@ -67,7 +68,7 @@ begin
       i_background       => s_i_background,
       i_ppuctrl_bit6     => s_i_ppuctrl_bit6,
       io_ext             => s_io_ext,
-      i_palette_ram_data => s_i_palette_ram_data,
+      i_palette_ram_data => s_data,
       o_palette_ram_addr => s_o_palette_ram_addr,
       o_color_pixel      => s_o_color_pixel
     );
@@ -80,6 +81,25 @@ begin
     clk_count <= clk_count + 1;
   end process;
 
+  s_i_ppuctrl_bit6 <= '0'; -- Use EXT as input
+  ext : process (all) is
+  begin
+    if s_i_ppuctrl_bit6 then
+      s_io_ext <= (others => 'Z'); -- Set to high-impedance (not driven by this module)
+    else
+      s_io_ext <= x"6"; -- Connect EXT to GND
+    end if;
+  end process;
+
+  addr_mux : process (all) is
+  begin
+    if s_i_we then
+      s_i_addr <= s_addr_init;
+    else
+      s_i_addr <= s_o_palette_ram_addr(4 downto 0);
+    end if;
+  end process;
+
   test : process is
 
     -- IO file variables
@@ -88,13 +108,10 @@ begin
 
   begin
 
-    s_i_enb          <= '0'; -- Disable Color Pixel Generator
-    s_io_ext         <= x"0"; -- Connect EXT to GND
-    s_i_ppuctrl_bit6 <= '0'; -- Use EXT as input
-
-    s_i_we <= '1'; -- Write palette RAM
+    s_i_enb <= '0'; -- Disable Color Pixel Generator
+    s_i_we  <= '1'; -- Write palette RAM
     for i in 0 to (2 ** C_ADDR_WIDTH) - 1 loop
-      s_i_addr <= std_logic_vector(to_unsigned(i, s_i_addr'length));
+      s_addr_init <= std_logic_vector(to_unsigned(i, s_addr_init'length));
       if not endfile(ram_content) then
         readline(ram_content, v_line);
         read(v_line, v_int);
@@ -120,9 +137,6 @@ begin
         read(v_line, v_int);
         s_i_background <= std_logic_vector(to_unsigned(v_int, s_i_background'length));
       end if;
-
-      s_i_addr             <= s_o_palette_ram_addr(4 downto 0); -- Connect RAM to CPG
-      s_i_palette_ram_data <= s_o_data; -- Connect RAM to CPG
 
       -- Write output
       write(v_line, to_hstring(s_o_color_pixel));
