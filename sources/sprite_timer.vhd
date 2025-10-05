@@ -11,6 +11,7 @@ entity sprite_timer is
     port (
         i_clk : in STD_LOGIC;
         i_load_enable : in STD_LOGIC;
+        i_start : in STD_LOGIC; --starts the timer
         i_pattern_low : in STD_LOGIC_VECTOR(7 downto 0);
         i_pattern_high : in STD_LOGIC_VECTOR(7 downto 0);
         i_attribute_low : in STD_LOGIC;
@@ -141,11 +142,11 @@ begin
       s_priority (7 downto 0) <= (others => i_priority);
 
       --logic for activating timers and shift registers
-      timers: process(i_load_enable, s_x_done, s_8_done) is
+      timers: process(i_start, s_x_done, s_8_done) is
       begin
 
-            --load enable signals a new cycle of bits so the x-coordinate timer starts when the x-coo is greater than 0
-            if(rising_edge(i_load_enable)) then
+            --start signals a new cycle of bits so the x-coordinate timer starts when the x-coo is greater than 0
+            if(rising_edge(i_start)) then
                 if(i_x > 0) then
                 s_x_enbl <= '1';
                 elsif(i_x = 0) then
