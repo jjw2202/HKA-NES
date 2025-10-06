@@ -1,5 +1,7 @@
 # HKA-NES
 
+This project was created as a project assignment in the Electrical Engineering programme at Karlsruhe University of Applied Sciences. The Goal was to implement the Picture processing unit (PPU) of the NES on the FPGA using VHDL. The PPU gets inputs from the CPU and is also connected to the Character ROM and by this creates output data that can be interpreted to be a picture on a screen. Please note that this project only covers the PPU. In the following you will find a short breakdown of the used modules and their purpose.
+
 ## Sprite Control Unit:
 
 This block is active while foreground rendering is enabled. Its purpose is it to evaluate in each scanline which sprites will be rendered there. For that it takes input from the OAM and compares the y-coordinate with the current scanline stored in the v-register. If a valid sprite is found, its data will be transferred to the OAM RAM (secondary OAM) and after that it will be loaded into the rendering shift registers.
