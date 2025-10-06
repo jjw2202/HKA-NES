@@ -13,7 +13,6 @@ end sprite_timer_tb;
 architecture Behavioral of sprite_timer_tb is
     signal s_clk : STD_LOGIC := '0';
     signal s_load_enable : STD_LOGIC := '0';
-    signal s_start : STD_LOGIC := '0';
     signal s_pattern_low : STD_LOGIC_VECTOR(7 downto 0);
     signal s_pattern_high : STD_LOGIC_VECTOR(7 downto 0);
     signal s_attribute_low : STD_LOGIC;
@@ -31,7 +30,6 @@ begin
     port map (
         i_clk => s_clk,
         i_load_enable => s_load_enable,
-        i_start => s_start,
         i_pattern_low => s_pattern_low,
         i_pattern_high => s_pattern_high,
         i_attribute_low => s_attribute_low,
@@ -50,9 +48,8 @@ begin
 
     process is
     begin
-        --check loading and waiting for x and starting at start
+        --check loading and waiting for x
         s_load_enable <= '0';
-        s_start <= '0';
         wait for 1 ns;
         s_load_enable <= '1';
         s_pattern_low <= "10011001";
@@ -62,15 +59,11 @@ begin
         s_priority <= '1';
         s_flip <= '0';
         s_x <= "00000011";
-        wait for 20 ns;
-        s_start <= '1';
         wait for 5 ns;
-        s_start <= '0';
         s_load_enable <= '0';
         wait for 104 ns;
         --check loading immediatly after output and flip
         s_load_enable <= '1';
-        s_start <= '1';
         s_pattern_low <= "11010100";
         s_pattern_high <= "11010100";
         s_attribute_low <= '1';

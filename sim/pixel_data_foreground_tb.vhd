@@ -13,7 +13,6 @@ end pixel_data_foreground_tb;
 architecture Behavioral of pixel_data_foreground_tb is
     signal s_clk : STD_LOGIC := '0';
     signal s_load_enable : STD_LOGIC := '0';
-    signal s_start : STD_LOGIC := '0';
     signal s_pattern_low_0 : STD_LOGIC_VECTOR(7 downto 0) := (others => '0');
     signal s_pattern_low_1 : STD_LOGIC_VECTOR(7 downto 0) := (others => '0');
     signal s_pattern_low_2 : STD_LOGIC_VECTOR(7 downto 0) := (others => '0');
@@ -51,7 +50,6 @@ begin
     port map (
         i_clk => s_clk,
         i_load_enable => s_load_enable,
-        i_start => s_start,
         i_sprite_pattern_low_0 => s_pattern_low_0,
         i_sprite_pattern_low_1 => s_pattern_low_1,
         i_sprite_pattern_low_2 => s_pattern_low_2,
@@ -92,10 +90,8 @@ begin
     begin
         --test with just one active shift register
         s_load_enable <= '0';
-        s_start <= '0';
         wait for 1 ns;
         s_load_enable <= '1';
-        s_start <= '1';
         s_pattern_low_0 <= "11111111";
         s_pattern_high_0 <= "11111111";
         s_attribute_low (0) <= '1';
@@ -104,11 +100,9 @@ begin
         s_x_0 <= "00000011";
         wait for 5 ns;
         s_load_enable <= '0';
-        s_start <= '0';
         wait for 135 ns;
         --test if it shows the right shift register
         s_load_enable <= '1';
-        s_start <= '1';
         s_pattern_low_0 <= "01010101";
         s_pattern_high_0 <= "01010100";
         s_attribute_low (0) <= '1';

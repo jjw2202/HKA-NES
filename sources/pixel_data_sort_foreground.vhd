@@ -10,7 +10,6 @@ entity pixel_data_sort_foreground is
     port (
         i_clk : in STD_LOGIC;
         i_load_enable : in STD_LOGIC;
-        i_start : in STD_LOGIC;
         i_sprite_pattern_low_0 : in STD_LOGIC_VECTOR (7 downto 0);
         i_sprite_pattern_low_1 : in STD_LOGIC_VECTOR (7 downto 0);
         i_sprite_pattern_low_2 : in STD_LOGIC_VECTOR (7 downto 0);
@@ -64,7 +63,6 @@ begin
     port map (
         i_clk => i_clk,
         i_load_enable => i_load_enable,
-        i_start => i_start,
         i_pattern_low => i_sprite_pattern_low_0,
         i_pattern_high => i_sprite_pattern_high_0,
         i_attribute_low => i_sprite_attribute_low(0),
@@ -80,7 +78,6 @@ begin
     port map (
         i_clk => i_clk,
         i_load_enable => i_load_enable,
-        i_start => i_start,
         i_pattern_low => i_sprite_pattern_low_1,
         i_pattern_high => i_sprite_pattern_high_1,
         i_attribute_low => i_sprite_attribute_low(1),
@@ -96,7 +93,6 @@ begin
     port map (
         i_clk => i_clk,
         i_load_enable => i_load_enable,
-        i_start => i_start,
         i_pattern_low => i_sprite_pattern_low_2,
         i_pattern_high => i_sprite_pattern_high_2,
         i_attribute_low => i_sprite_attribute_low(2),
@@ -112,7 +108,6 @@ begin
     port map (
         i_clk => i_clk,
         i_load_enable => i_load_enable,
-        i_start => i_start,
         i_pattern_low => i_sprite_pattern_low_3,
         i_pattern_high => i_sprite_pattern_high_3,
         i_attribute_low => i_sprite_attribute_low(3),
@@ -128,7 +123,6 @@ begin
     port map (
         i_clk => i_clk,
         i_load_enable => i_load_enable,
-        i_start => i_start,
         i_pattern_low => i_sprite_pattern_low_4,
         i_pattern_high => i_sprite_pattern_high_4,
         i_attribute_low => i_sprite_attribute_low(4),
@@ -144,7 +138,6 @@ begin
     port map (
         i_clk => i_clk,
         i_load_enable => i_load_enable,
-        i_start => i_start,
         i_pattern_low => i_sprite_pattern_low_5,
         i_pattern_high => i_sprite_pattern_high_5,
         i_attribute_low => i_sprite_attribute_low(5),
@@ -160,7 +153,6 @@ begin
     port map (
         i_clk => i_clk,
         i_load_enable => i_load_enable,
-        i_start => i_start,
         i_pattern_low => i_sprite_pattern_low_6,
         i_pattern_high => i_sprite_pattern_high_6,
         i_attribute_low => i_sprite_attribute_low(6),
@@ -176,7 +168,6 @@ begin
     port map (
         i_clk => i_clk,
         i_load_enable => i_load_enable,
-        i_start => i_start,
         i_pattern_low => i_sprite_pattern_low_7,
         i_pattern_high => i_sprite_pattern_high_7,
         i_attribute_low => i_sprite_attribute_low(7),
