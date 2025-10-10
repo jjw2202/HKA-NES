@@ -20,13 +20,14 @@ architecture rtl of tb_color_pixel_gen is
   file output      : text open write_mode is "D:/Dokumente/Projektarbeit/HKA-NES/sim/visualize_ppu_output/PPUoutput.txt";
 
   -- Palette RAM parameters
-  constant C_ADDR_WIDTH : integer := 5;
-  constant C_DATA_WIDTH : integer := 24;
-  signal s_i_clk        : std_logic;
-  signal s_i_we         : std_logic;
-  signal s_i_addr       : std_logic_vector(C_ADDR_WIDTH - 1 downto 0);
-  signal s_i_data       : std_logic_vector(C_DATA_WIDTH - 1 downto 0);
-  signal s_data         : std_logic_vector(C_DATA_WIDTH - 1 downto 0);
+  constant C_EXT_ADDR_WIDTH : integer := 14;
+  constant C_INT_ADDR_WIDTH : integer := 5;
+  constant C_DATA_WIDTH     : integer := 24;
+  signal s_i_clk            : std_logic;
+  signal s_i_we             : std_logic;
+  signal s_i_addr           : std_logic_vector(C_EXT_ADDR_WIDTH - 1 downto 0);
+  signal s_i_data           : std_logic_vector(C_DATA_WIDTH - 1 downto 0);
+  signal s_data             : std_logic_vector(C_DATA_WIDTH - 1 downto 0);
 
   -- Color Pixel Generator parameters
   signal s_i_enb              : std_logic;
@@ -34,10 +35,10 @@ architecture rtl of tb_color_pixel_gen is
   signal s_i_background       : std_logic_vector(3 downto 0);
   signal s_i_ppuctrl_bit6     : std_logic;
   signal s_io_ext             : std_logic_vector(3 downto 0);
-  signal s_o_palette_ram_addr : std_logic_vector(13 downto 0);
-  signal s_o_color_pixel      : std_logic_vector(23 downto 0);
+  signal s_o_palette_ram_addr : std_logic_vector(C_EXT_ADDR_WIDTH - 1 downto 0);
+  signal s_o_color_pixel      : std_logic_vector(C_DATA_WIDTH - 1 downto 0);
 
-  signal s_addr_init : std_logic_vector(C_ADDR_WIDTH - 1 downto 0);
+  signal s_addr_init : std_logic_vector(C_EXT_ADDR_WIDTH - 1 downto 0);
 
   -- Clock management
   constant CLK_PERIOD : time    := 10 ns;
@@ -47,8 +48,9 @@ begin
 
   palette_ram : entity work.ram
     generic map(
-      G_ADDR_WIDTH => C_ADDR_WIDTH,
-      G_DATA_WIDTH => C_DATA_WIDTH
+      G_EXT_ADDR_WIDTH => C_EXT_ADDR_WIDTH,
+      G_INT_ADDR_WIDTH => C_INT_ADDR_WIDTH,
+      G_DATA_WIDTH     => C_DATA_WIDTH
     )
     port map
     (
@@ -87,7 +89,7 @@ begin
     if s_i_ppuctrl_bit6 then
       s_io_ext <= (others => 'Z'); -- Set to high-impedance (not driven by this module)
     else
-      s_io_ext <= x"6"; -- Connect EXT to GND
+      s_io_ext <= x"0"; -- Connect EXT to GND
     end if;
   end process;
 
@@ -96,7 +98,7 @@ begin
     if s_i_we then
       s_i_addr <= s_addr_init;
     else
-      s_i_addr <= s_o_palette_ram_addr(4 downto 0);
+      s_i_addr <= s_o_palette_ram_addr;
     end if;
   end process;
 
@@ -110,7 +112,7 @@ begin
 
     s_i_enb <= '0'; -- Disable Color Pixel Generator
     s_i_we  <= '1'; -- Write palette RAM
-    for i in 0 to (2 ** C_ADDR_WIDTH) - 1 loop
+    for i in 0 to (2 ** C_INT_ADDR_WIDTH) - 1 loop
       s_addr_init <= std_logic_vector(to_unsigned(i, s_addr_init'length));
       if not endfile(ram_content) then
         readline(ram_content, v_line);
