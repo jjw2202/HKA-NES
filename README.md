@@ -4,30 +4,36 @@
 
 This project was created as a project assignment in the Electrical Engineering programme at [Karlsruhe University of Applied Sciences](https://www.h-ka.de/). The goal was to implement the Picture Processing Unit (PPU) of the NES on a FPGA using the hardware description language VHDL. The PPU gets inputs from the CPU and is also connected to the character ROM. In this way, it generates output data that can be interpreted as an image on a screen. Please note that this project only covers the PPU. Below is a brief overview of the modules used and their purpose.
 
-## Motivation
+### Motivation
+The motivation for this project was to make VHDL more interesting and accessible to learners, to create a good resource for understanding the NES, and thus to contribute to the preservation of knowledge. This project is also intended to serve as the basis for a laboratory at our university and should also serve as a source for illustrating the coding standard and motivating our fellow students to learn more about the NES and VHDL.
 
-The motivation for this project was it to make VHDL more interesting and accessible for new learners, to create another source for understanding the NES and therefore helping to conserve it better. Also this project was intended as a foundation for a laboratory at our university and for that also as a source to show the coding standard of it and motivate our fellow students to learn more about the NES and VHDL.
+We launched our own project for this purpose, as other implementations did not fully meet our requirements mentioned above. They were either too difficult to understand, based on Verilog instead of VHDL, were too close or too far from the original PPU, and did not have the academic background we needed.
 
-We created our own new project for that because other implementations didn't fully suit our needs explained above. They were either too hard to understand, were in Verilog instead of VHDL, were too close or too far from the original PPU and didn't have the university background we needed.
+### Goals
+Our goal was therfore:
+- to document the PPU as thoroughly as possible, so that students could understand it
+- to implement the PPU in accordance with the university's coding standard
+- to make minor adjustments so that it would work with modern hardware
+- to generate at least one still image of a game
 
-## Goals
+The goal was not to implement a fully functional NES, and currently there is no CPU available.
 
-So therefore our goal was it to document the PPU as good as possible for students to understand, to implement the PPU following the university's coding standard, make small adjustments for it to work with modern hardware and in the end show at least one freeze frame of a game. It was not the goal to implement a fully functioning NES and also there will be no CPU attached to it. 
+### Implementation
+First, we tried to understand the PPU as well as possible. To do this, we created the [block diagram](#block-diagram) shown below. Based on this, we created blocks, each with a specific function, according to the principle of _"divide et impera"_, for example, a block that controls the background generation or a block that decides which pixels should be displayed. These can also be found below in the [VHDL entities](#vhdl-entities). We then began to implement these blocks from the end so that it was always clear which signal was to be generated. Each block has its own simulation to check that it is working correctly. During implementation, we tried to stay as close as possible to the original PPU. Nevertheless, we decided not to implement some parts for the time being. The following functions have not been implemented:
+- the scroll function
+- the Sprite-0 flag
+- the sprite overflow error
+- parts of the PPU-MASK function
 
-## Implementation
+The main reason for this was a lack of time, so we concentrated on the functions that are essential for generating a frame.
 
-We first tried to understand the PPU as good as possible. For that we created the blockdiagram you can find below. Based on that we created blocks that would have one specific function following the principle of "divide et impera", for example a block that controls the background rendering or a block that decides which pixel to render. Those you can also find below in VHDL Entities. We then started to write these blocks beginning from the very end so it would always be clear what signal we want to be generated. Every block has its own simulation for verifying that it functions correctly. When implementing we tried to be as close to the original PPU as possible but made some decisions to leave out parts of it for now. Not implemented is the scrolling feature, the sprite 0 flag, the sprite overflow bug and parts of the PPU MASK register. The reason for that was mainly time so we focused on the features that are essential for generating one frame.
+### Evaluation 
+Have we achieved our goals? We have documented our work here with pictures, comments and explanations. We have also programmed in accordance with our university's coding standards. All essential PPU functions have been implemented, so we now have a functional PPU. However, as you have already read, the PPU does not correspond exactly to the original. We are also able to generate a still image. For a moving image, we would need to connect the CPU as well. We are satisfied with our result and consider it a success, even though there is still room for further implementation.
 
-## Evaluation 
+### Outlook
+In future, you too could get involved and, for example, implement the above-mentioned functions that have not yet been implemented. A CPU must be connected for moving images, and a VGA or HDMI encoder is required to display an image on a television. The overall goal could be a fully implemented NES in which not only the PPU works, but also the other parts such as the CPU, APU, etc.
 
-Did we fulfill our goals? We documented our work here with pictures, comments and texts. We also coded following the guidelines of our university. All the essential PPU features are implemented so that we have a functioning PPU. But as you read before the PPU is not exactly like the original one. We are also able to generate one still frame. For a moving picture we would also have to connect the CPU. We are satisfied with our result and count it as a success even though there is still room for further implementation.
-
-## Outlook
-
-In the future you could also implement the features mentioned above that are not implemented but are also not essential. Also for moving pictures a CPU has to be attached and for getting a picture on a TV a VGA or HDMI encoder has to be added. The overall goal could be to have a fully implemented NES with not only the PPU working but also the other parts like CPU, APU etc.
-
-
-## Blockdiagram
+## Block diagram
 [![Blockdiagram PPU](docs/blockdiagram/HKA-NES_Blockdiagram-PPU.png)](docs/blockdiagram/HKA-NES_Blockdiagram-PPU.png)
 
 ## VHDL Entities
