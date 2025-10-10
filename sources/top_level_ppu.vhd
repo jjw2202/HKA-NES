@@ -39,16 +39,13 @@ end entity;
 
 architecture rtl of ppu is
 
-  signal x : std_logic; -- placeholder - WIP
-
   -- Pixel pipeline
-  signal s_palette_ram_addr : std_logic_vector(13 downto 0);
-  signal s_palette_ram_data : std_logic_vector(23 downto 0);
-  signal s_foreground       : std_logic_vector(4 downto 0);
-  signal s_background       : std_logic_vector(3 downto 0);
+  signal s_foreground : std_logic_vector(4 downto 0);
+  signal s_background : std_logic_vector(3 downto 0);
 
   -- Sprite control
   signal s_sprite_load_enb : std_logic;
+  signal s_sprite_start    : std_logic;
 
   signal s_sprite_pattern_l0 : std_logic_vector(7 downto 0);
   signal s_sprite_pattern_l1 : std_logic_vector(7 downto 0);
@@ -83,12 +80,76 @@ architecture rtl of ppu is
   signal s_sprite_x7 : std_logic_vector(7 downto 0);
 
   -- Background control
-  signal s_back_load_enb : std_logic;
+  signal s_back_load_enb      : std_logic;
+  signal s_back_load_internal : std_logic;
+  signal s_back_load_mmio     : std_logic;
 
   signal s_back_pattern_l   : std_logic_vector(7 downto 0);
   signal s_back_pattern_h   : std_logic_vector(7 downto 0);
   signal s_back_attribute_l : std_logic;
   signal s_back_attribute_h : std_logic;
+
+  -- Registers
+  signal s_register_mmio_we     : std_logic;
+  signal s_register_mmio_addr   : std_logic_vector(13 downto 0);
+  signal s_register_mmio_data_i : std_logic_vector(7 downto 0);
+  signal s_register_mmio_data_o : std_logic_vector(7 downto 0);
+
+  signal s_register_mmio_oamdma_we     : std_logic;
+  signal s_register_mmio_oamdma_addr   : std_logic_vector(13 downto 0);
+  signal s_register_mmio_oamdma_data_i : std_logic_vector(7 downto 0);
+  signal s_register_mmio_oamdma_data_o : std_logic_vector(7 downto 0);
+
+  signal s_register_mmio_ppuctrl   : std_logic_vector(7 downto 0);
+  signal s_register_mmio_ppumask   : std_logic_vector(7 downto 0);
+  signal s_register_mmio_ppustatus : std_logic_vector(7 downto 0);
+  signal s_register_mmio_oamaddr   : std_logic_vector(7 downto 0);
+  signal s_register_mmio_oamdata   : std_logic_vector(7 downto 0);
+  signal s_register_mmio_ppuscroll : std_logic_vector(7 downto 0);
+  signal s_register_mmio_ppuaddr   : std_logic_vector(7 downto 0);
+  signal s_register_mmio_ppudata   : std_logic_vector(7 downto 0);
+  signal s_register_mmio_oamdma    : std_logic_vector(7 downto 0);
+
+  signal s_register_internal_we     : std_logic;
+  signal s_register_internal_addr   : std_logic_vector(1 downto 0);
+  signal s_register_internal_data_i : std_logic_vector(14 downto 0);
+  signal s_register_internal_data_o : std_logic_vector(14 downto 0);
+  signal s_register_internal_v      : std_logic_vector(14 downto 0);
+  signal s_register_internal_t      : std_logic_vector(14 downto 0);
+  signal s_register_internal_x      : std_logic_vector(2 downto 0);
+  signal s_register_internal_w      : std_logic;
+
+  -- OAM
+  signal s_oam_we     : std_logic;
+  signal s_oam_addr   : std_logic_vector(7 downto 0);
+  signal s_oam_data_i : std_logic_vector(7 downto 0);
+  signal s_oam_data_o : std_logic_vector(7 downto 0);
+
+  signal s_oam_ram_we     : std_logic;
+  signal s_oam_ram_addr   : std_logic_vector(4 downto 0);
+  signal s_oam_ram_data_i : std_logic_vector(7 downto 0);
+  signal s_oam_ram_data_o : std_logic_vector(7 downto 0);
+
+  -- Nametable
+  signal s_nametable_we     : std_logic;
+  signal s_nametable_addr   : std_logic_vector(14 downto 0);
+  signal s_nametable_data_i : std_logic_vector(24 downto 0);
+  signal s_nametable_data_o : std_logic_vector(24 downto 0);
+
+  -- Pattern tables
+  signal s_patterntable_we   : std_logic;
+  signal s_patterntable_addr : std_logic_vector(14 downto 0);
+  signal s_patterntable_data : std_logic_vector(7 downto 0);
+
+  -- System palette
+  signal s_systempalette_addr : std_logic_vector(5 downto 0);
+  signal s_systempalette_data : std_logic_vector(23 downto 0);
+
+  -- Frame palette
+  signal s_framepalette_we     : std_logic;
+  signal s_framepalette_addr   : std_logic_vector(13 downto 0);
+  signal s_framepalette_data_i : std_logic_vector(23 downto 0);
+  signal s_framepalette_data_o : std_logic_vector(23 downto 0);
 
 begin
 
@@ -98,11 +159,12 @@ begin
     (
       clka  => i_clk,
       ena   => i_enb,
-      addra => x,
-      douta => x
+      addra => s_systempalette_addr,
+      douta => s_systempalette_data
     );
 
-  palette_ram : entity work.ppu_ram
+  palette_ram : entity work.ram
+    -- Address range: $3F00 - $3F1F
     generic map
     (
       G_EXT_ADDR_WIDTH => 14,
@@ -112,13 +174,48 @@ begin
     port map
     (
       i_clk       => i_clk,
-      i_write_enb => x,
-      i_addr      => s_palette_ram_addr,
-      i_data      => x,
-      o_data      => s_palette_ram_data
+      i_write_enb => s_framepalette_we,
+      i_addr      => s_framepalette_addr,
+      i_data      => s_framepalette_data_i,
+      o_data      => s_framepalette_data_o
     );
 
-  nametables : entity work.ppu_ram
+  oam : entity work.ram
+    generic map
+    (
+      G_EXT_ADDR_WIDTH => 14,
+      G_INT_ADDR_WIDTH => 8,
+      G_DATA_WIDTH     => 8
+    )
+    port map
+    (
+      i_clk       => i_clk,
+      i_write_enb => s_oam_we,
+      i_addr      => s_oam_addr,
+      i_data      => s_oam_data_i,
+      o_data      => s_oam_data_o
+    );
+
+  oam_ram : entity work.ram
+    generic map
+    (
+      G_EXT_ADDR_WIDTH => 14,
+      G_INT_ADDR_WIDTH => 5,
+      G_DATA_WIDTH     => 8
+    )
+    port map
+    (
+      i_clk       => i_clk,
+      i_write_enb => s_oam_ram_we,
+      i_addr      => s_oam_ram_addr,
+      i_data      => s_oam_ram_data_i,
+      o_data      => s_oam_ram_data_o
+    );
+
+  nametables : entity work.ram
+    -- Address range:
+    -- Nametable A + Attribute table A: $2000 - $23BF & $23C0 - $23FF
+    -- Nametable B + Attribute table B: $2400 - $27BF & $27C0 - $27FF
     generic map
     (
       G_EXT_ADDR_WIDTH => 14,
@@ -128,10 +225,69 @@ begin
     port map
     (
       i_clk       => i_clk,
-      i_write_enb => x,
-      i_addr      => x,
-      i_data      => x,
-      o_data      => x
+      i_write_enb => s_nametable_we,
+      i_addr      => s_nametable_addr,
+      i_data      => s_nametable_data_i,
+      o_data      => s_nametable_data_o
+    );
+
+  registers_mmio : entity work.ram
+    -- Addresses:
+    -- PPUCTRL     (W): $2000
+    -- PPUMASK     (W): $2001
+    -- PPUSTATUS   (R): $2002
+    -- OAMADDR     (W): $2003
+    -- OAMDATA    (RW): $2004
+    -- PPUSCROLL (Wx2): $2005
+    -- PPUADDR   (Wx2): $2006
+    -- PPUDATA    (RW): $2007
+    generic map
+    (
+      G_EXT_ADDR_WIDTH => 14,
+      G_INT_ADDR_WIDTH => 3,
+      G_DATA_WIDTH     => 8
+    )
+    port map
+    (
+      i_clk       => i_clk,
+      i_write_enb => s_register_mmio_we,
+      i_addr      => s_register_mmio_addr,
+      i_data      => s_register_mmio_data_i,
+      o_data      => s_register_mmio_data_o
+    );
+
+  register_OAMDMA : entity work.ram
+    -- Address:
+    -- OAMDMA (W): $1014
+    generic map
+    (
+      G_EXT_ADDR_WIDTH => 14,
+      G_INT_ADDR_WIDTH => 1,
+      G_DATA_WIDTH     => 8
+    )
+    port map
+    (
+      i_clk       => i_clk,
+      i_write_enb => s_register_mmio_oamdma_we,
+      i_addr      => s_register_mmio_oamdma_addr,
+      i_data      => s_register_mmio_oamdma_data_i,
+      o_data      => s_register_mmio_oamdma_data_o
+    );
+
+  registers_internal : entity work.ram
+    generic map
+    (
+      G_EXT_ADDR_WIDTH => 2,
+      G_INT_ADDR_WIDTH => 2,
+      G_DATA_WIDTH     => 15
+    )
+    port map
+    (
+      i_clk       => i_clk,
+      i_write_enb => s_register_internal_we,
+      i_addr      => s_register_internal_addr,
+      i_data      => s_register_internal_data_i,
+      o_data      => s_register_internal_data_o
     );
 
   -- Pixel pipeline
@@ -155,12 +311,14 @@ begin
       i_clk                => i_clk,
       i_back_load_enable   => s_back_load_enb,
       i_sprite_load_enable => s_sprite_load_enb,
+      i_start              => s_sprite_start,
 
       i_back_pattern_low    => s_back_pattern_l,
       i_back_pattern_high   => s_back_pattern_h,
       i_back_attribute_low  => s_back_attribute_l,
       i_back_attribute_high => s_back_attribute_h,
-      o_back_pixel          => s_background,
+
+      o_back_pixel => s_background,
 
       i_sprite_pattern_low_0 => s_sprite_pattern_l0,
       i_sprite_pattern_low_1 => s_sprite_pattern_l1,
@@ -201,24 +359,24 @@ begin
     port map
     (
       i_clk           => i_clk,
-      i_v             => x,
-      i_render_enbl   => x,
-      i_pattern_table => x,
+      i_v             => s_register_internal_v,
+      i_render_enbl   => s_register_mmio_ppumask(4),
+      i_pattern_table => s_register_mmio_ppuctrl(3),
 
-      i_oam_ram      => x,
-      o_oam_ram_addr => x,
-      o_oam_ram      => x,
-      o_oam_ram_we   => x,
+      i_oam_ram      => s_oam_ram_data_i,
+      o_oam_ram_addr => s_oam_ram_addr,
+      o_oam_ram      => s_oam_ram_data_o,
+      o_oam_ram_we   => s_oam_ram_we,
 
-      i_oam      => x,
-      o_oam_addr => x,
-      o_oam_we   => x,
+      i_oam      => s_oam_data_i,
+      o_oam_addr => s_oam_addr,
+      o_oam_we   => s_oam_we,
 
-      i_pattern      => x,
-      o_pattern_addr => x,
-      o_pattern_we   => x,
+      i_pattern      => s_patterntable_data,
+      o_pattern_addr => s_patterntable_addr,
+      o_pattern_we   => s_patterntable_we,
 
-      o_sprite_overflow => x,
+      o_sprite_overflow => s_register_mmio_ppustatus(5),
 
       o_pattern_l0 => s_sprite_pattern_l0,
       o_pattern_l1 => s_sprite_pattern_l1,
@@ -253,7 +411,47 @@ begin
       o_x7 => s_sprite_x7,
 
       o_load_enbl   => s_sprite_load_enb,
-      o_start_shift => x
+      o_start_shift => s_sprite_start
     );
+
+  background_control_unit : entity work.background_control_unit
+    port map
+    (
+      i_clk           => i_clk,
+      o_v             => s_register_internal_v,
+      i_render_enbl   => s_register_mmio_ppumask(3),
+      i_pattern_table => s_register_mmio_ppuctrl(4),
+
+      i_nametables => s_nametable_data_o,
+      o_name_adr   => s_nametable_addr,
+      o_name_we    => s_nametable_we,
+
+      i_attributes => s_nametable_data_o,
+      o_attr_adr   => s_nametable_addr,
+      o_attr_we    => s_nametable_we,
+
+      i_pattern     => s_patterntable_data,
+      o_pattern_adr => s_patterntable_addr,
+      o_pattern_we  => s_patterntable_we,
+
+      o_pattern_low    => s_back_pattern_l,
+      o_pattern_high   => s_back_pattern_h,
+      o_attribute_low  => s_back_attribute_l,
+      o_attribute_high => s_back_attribute_h,
+
+      o_load_enbl     => s_back_load_enb,
+      o_load_internal => s_back_load_internal,
+      o_load_mmio     => s_back_load_mmio,
+
+      o_vblank     => s_register_mmio_ppustatus(5),
+      o_sprite0hit => s_register_mmio_ppustatus(6)
+    );
+
+  ------------------------------------------------------------------------------------------
+
+  -- Mapping
+  s_back_load_internal <= s_register_internal_we;
+  s_back_load_mmio     <= s_register_mmio_we;
+  s_back_load_mmio     <= s_register_mmio_oamdma_we;
 
 end architecture;

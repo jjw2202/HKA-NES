@@ -4,7 +4,7 @@
     "xci_name": "sim_pattern_rom",
     "component_reference": "xilinx.com:ip:blk_mem_gen:8.4",
     "ip_revision": "11",
-    "gen_directory": "[get_property DIRECTORY [current_project]]/[get_property NAME [current_project]].gen/sources_1/ip/sim_pattern_rom",
+    "gen_directory": "[get_property DIRECTORY [current_project]]/[get_property NAME [current_project]].gen/sources_1/ip/sim_pattern_rom/sim_pattern_rom",
     "parameters": {
       "component_parameters": {
         "Component_Name": [ { "value": "sim_pattern_rom", "resolve_type": "user", "usage": "all" } ],
@@ -174,7 +174,7 @@
         "IPCONTEXT": [ { "value": "IP_Flow" } ],
         "IPREVISION": [ { "value": "11" } ],
         "MANAGED": [ { "value": "TRUE" } ],
-        "OUTPUTDIR": [ { "value": "[get_property DIRECTORY [current_project]]/[get_property NAME [current_project]].gen/sources_1/ip/sim_pattern_rom" } ],
+        "OUTPUTDIR": [ { "value": "[get_property DIRECTORY [current_project]]/[get_property NAME [current_project]].gen/sources_1/ip/sim_pattern_rom/sim_pattern_rom" } ],
         "SELECTEDSIMMODEL": [ { "value": "" } ],
         "SHAREDDIR": [ { "value": "." } ],
         "SWVERSION": [ { "value": "2025.1" } ],

@@ -12,6 +12,7 @@ entity pixel_data_sort is
     i_clk                : in std_logic;
     i_back_load_enable   : in std_logic;
     i_sprite_load_enable : in std_logic;
+    i_start              : in std_logic;
 
     i_back_pattern_low    : in std_logic_vector (7 downto 0);
     i_back_pattern_high   : in std_logic_vector (7 downto 0);
@@ -74,6 +75,7 @@ begin
 
       i_clk                   => i_clk,
       i_load_enable           => i_sprite_load_enable,
+      i_start                 => i_start,
       i_sprite_pattern_low_0  => i_sprite_pattern_low_0,
       i_sprite_pattern_low_1  => i_sprite_pattern_low_1,
       i_sprite_pattern_low_2  => i_sprite_pattern_low_2,
